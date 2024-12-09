@@ -28,9 +28,13 @@ public interface RoomBookingService {
 
     boolean updateRoom_DatPhong(int bookingId, String customerName, Timestamp startTime, Timestamp endTime);
 
-    boolean updateRoom_HuyPhong(String customerName);
+     boolean updateRoom_HuyPhong(int bookingId, String customerName, Timestamp startTime, Timestamp endTime);
+
+     boolean updateRoom_HuyPhong_rutgon(int bookingId);
 
     boolean deleteRoom(int roomId);
 
+
+    public boolean updateTableRevenue_DatPhong(double total_revenue, Timestamp startTime, Timestamp endTime);
 }
 

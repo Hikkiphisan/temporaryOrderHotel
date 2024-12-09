@@ -311,7 +311,97 @@
                 transform: translateX(100%) rotate(30deg);
             }
         }
+
+
+
+
+        .btn-payment {
+            background: linear-gradient(45deg, #e74c3c, #e67e22);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-payment:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+            background: linear-gradient(45deg, #c0392b, #d35400);
+        }
+
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .fa-check-circle {
+            color: #2ecc71;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+
+
     </style>
+
+
+    <script>
+        function sendData() {
+            const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+            const loadingMessage = document.getElementById('loadingMessage');
+            const successMessage = document.getElementById('successMessage');
+
+            // Hiện modal
+            loadingMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+            paymentModal.show();
+
+            // Thêm dữ liệu cần gửi
+            const formData = new FormData();
+            formData.append('bookingId', "${param.bookingId}"); // Thêm thông tin bookingId từ server
+            formData.append('action', 'paymentProcessing'); // Dấu hiệu gửi thông tin thanh toán
+
+            fetch("${pageContext.request.contextPath}/rentRoomForm_Temporary", {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    loadingMessage.style.display = 'none';
+                    if (data.success) {
+                        successMessage.style.display = 'block';
+                    } else {
+                        alert('Thanh toán thất bại');
+                    }
+
+                    // Ẩn modal sau 2 giây
+                    setTimeout(() => {
+                        paymentModal.hide();
+                    }, 2000);
+                })
+                .catch(error => {
+                    console.error('Error during payment processing:', error);
+                    loadingMessage.style.display = 'none';
+                    alert('Đã xảy ra lỗi trong quá trình thanh toán');
+                    paymentModal.hide();
+                });
+        }
+    </script>
+
+
+
+
+
 </head>
 <body>
 <div class="title-container">
@@ -363,12 +453,23 @@
                     <div class="price-tag shine-effect">
                         <i class="fas fa-tag"></i>
                         ${param.roomPrice} VNĐ/giờ
+<%--                        day la roomrateperhour--%>
                     </div>
                 </div>
             </div>
         </div>
     </form>
 
+
+
+
+
+
+    <div class="payment-section text-center mb-4">
+        <button id="collectPayment" class="btn btn-payment shine-effect" onclick="sendData()">
+            <i class="fas fa-money-bill-wave"></i> Thu tiền
+        </button>
+    </div>
 
 
 
@@ -382,6 +483,7 @@
           id="rentRoomForm"
           class="needs-validation"
           novalidate>
+
 
         <!-- Trường ẩn để gửi giá trị action -->
         <input type="hidden" name="action" value="dat phong">
@@ -440,7 +542,57 @@
             </div>
         </div>
     </form>
+
+    <div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center py-4">
+                    <div id="loadingMessage">
+                        <div class="spinner-border text-primary mb-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mb-0">Đang thu tiền khách...</p>
+                    </div>
+                    <div id="successMessage" style="display: none;">
+                        <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+                        <p class="mb-0">Thanh toán thành công!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 </div>
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('collectPayment').addEventListener('click', function() {
+        // Show modal with loading message
+        const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+        const loadingMessage = document.getElementById('loadingMessage');
+        const successMessage = document.getElementById('successMessage');
+
+        loadingMessage.style.display = 'block';
+        successMessage.style.display = 'none';
+        paymentModal.show();
+
+        // Simulate payment processing
+        setTimeout(function() {
+            loadingMessage.style.display = 'none';
+            successMessage.style.display = 'block';
+
+            // Close modal after showing success message
+            setTimeout(function() {
+                paymentModal.hide();
+            }, 1500);
+        }, 2000);
+    });
+</script>
 
 
 

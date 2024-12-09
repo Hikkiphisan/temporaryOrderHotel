@@ -3,6 +3,8 @@ package org.example.temporary.dao;
 import org.example.temporary.model.RoomBooking;
 
 import java.sql.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -174,6 +176,7 @@ public class RoomBookingDaoImpl implements RoomBookingDAO {
     //thu nghiem Phương thức này cập nhật trạng thái của phòng dựa trên mã phòng (roomCode).
     public boolean updateRoomStatustoSql_DatPhong(int bookingId, String customerName, Timestamp startTime, Timestamp endTime) throws SQLException {
         String query = "UPDATE bookingver3 SET RoomStatus = 'rented', CustomerName = ?, BookingStartDate = ?, BookingEndDate = ? WHERE BookingId = ?";
+
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, customerName);
             pstmt.setTimestamp(2, startTime);   // Thời gian bắt đầu đặt phòng (do người dùng nhập)
@@ -184,6 +187,24 @@ public class RoomBookingDaoImpl implements RoomBookingDAO {
             return rowsAffected > 0;
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private void logRowsAffected(int rowsAffected) {
         if (rowsAffected > 0) {
@@ -198,12 +219,62 @@ public class RoomBookingDaoImpl implements RoomBookingDAO {
 
 
 
-    public boolean updateRoomStatustoSql_HuyPhong(String customerName) throws SQLException {
-        String query = "UPDATE Room SET RoomStatus = available, CustomerName = null, WHERE room_code = ?";
+    public boolean updateRoomStatustoSql_HuyPhong(int bookingId, String customerName, Timestamp startTime, Timestamp endTime) throws SQLException {
+        String query = "UPDATE bookingver3 SET RoomStatus = 'rented', CustomerName = 'Hiện tại không có ai thuê', BookingStartDate = '1970-01-01 00:00:00', BookingEndDate = '1970-01-01 00:00:00' WHERE BookingId = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setInt(1, bookingId);
             return pstmt.executeUpdate() > 0;
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+    /*
+    public boolean updateRoomStatustoSql_HuyPhong_rutgon(int bookingId) throws SQLException {
+        String query = "UPDATE bookingver3 SET RoomStatus = 'rented', CustomerName = 'Hiện tại không có ai thuê', " +
+                "BookingStartDate = '1970-01-01 00:00:00', BookingEndDate = '1970-01-01 00:00:00' WHERE BookingId = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setInt(1, bookingId); // Tham số bắt đầu từ 1
+            return pstmt.executeUpdate() > 0;
+        }
+    }
+*/
+
+    public boolean updateRoomStatustoSql_HuyPhong_rutgon(int bookingId) throws SQLException {
+        String query = "UPDATE bookingver3 SET RoomStatus = 'available', CustomerName = 'Hiện tại không có ai thuê', BookingStartDate = '2000-01-01 00:00:00', BookingEndDate = '2000-01-01 00:00:00' WHERE BookingId = ?";
+        ;
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            // Kiểm tra giá trị đầu vào
+            if (bookingId <= 0) {
+                throw new IllegalArgumentException("BookingId không hợp lệ: " + bookingId);
+            }
+
+            // Gán tham số vào PreparedStatement
+            pstmt.setInt(1, bookingId);
+
+            // Ghi log câu truy vấn (chỉ để debug, không dùng trong môi trường sản xuất)
+            System.out.println("Executing query: " + pstmt);
+
+            // Thực thi câu lệnh SQL
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e; // Báo lỗi để lớp gọi xử lý
+        }
+    }
+
+
+
+
+
 
     @Override
     public boolean updateRoomStatustoSql(String roomCode, String status) throws SQLException {
@@ -229,6 +300,10 @@ public class RoomBookingDaoImpl implements RoomBookingDAO {
             pstmt.setString(8, room.getRoomStatus());
             pstmt.setTimestamp(9, room.getRoomUpdateDate());
             pstmt.setInt(10, room.getRoomId());
+
+
+
+
             return pstmt.executeUpdate() > 0; //Phương thức trả về số lượng số nguyên đại diện cho số dòng bị thay đổi dữ liệu, trong trường hợp này nếu > 0 tức là đã có hơn 1 dòng bị thay đổi, nếu =0 tức là không có dòng nào bị thay đổi.
         }
     }
@@ -245,4 +320,98 @@ public class RoomBookingDaoImpl implements RoomBookingDAO {
             return pstmt.executeUpdate() > 0;
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //int month, int year, double total_revenue, Timestamp startTime, Timestamp endTime nhap tu view gui ve
+    public boolean update_to_table_monthly_revenue_on_Sql_DatPhong(double total_revenue, Timestamp startTime, Timestamp endTime) throws SQLException {
+        // Phân chia dữ liệu theo giờ tính toán trên các tháng nếu trải dài hai tháng khác nhau.
+        double[] calculatedHours = calculateHoursByMonth(startTime, endTime);
+        double revenueForMonth1 = calculatedHours[0] * total_revenue / (calculatedHours[0] + calculatedHours[1]);
+        double revenueForMonth2 = calculatedHours[1] * total_revenue / (calculatedHours[0] + calculatedHours[1]);
+
+        String query = "UPDATE monthly_revenue SET total_revenue = total_revenue + ? WHERE month = ? AND year = ?";
+        String querySecondMonth = "UPDATE monthly_revenue SET total_revenue = total_revenue + ? WHERE month = ? AND year = ?";
+
+        try (PreparedStatement pstmt1 = connection.prepareStatement(query);
+             PreparedStatement pstmt2 = connection.prepareStatement(querySecondMonth)) {
+
+
+            // Update tháng đầu tiên
+            pstmt1.setDouble(1, revenueForMonth1);
+            pstmt1.setInt(2, startTime.toLocalDateTime().getMonthValue());
+            pstmt1.setInt(3, startTime.toLocalDateTime().getYear());
+
+            // Update tháng thứ hai
+            pstmt2.setDouble(1, revenueForMonth2);
+            pstmt2.setInt(2, endTime.toLocalDateTime().getMonthValue());
+            pstmt2.setInt(3, endTime.toLocalDateTime().getYear());
+
+            int rowsAffected1 = pstmt1.executeUpdate();
+            int rowsAffected2 = pstmt2.executeUpdate();
+
+            logRowsAffected(rowsAffected1, rowsAffected2);
+
+            return rowsAffected1 > 0 || rowsAffected2 > 0;
+        }
+    }
+
+
+
+
+    public double[] calculateHoursByMonth(Timestamp startTime, Timestamp endTime) {
+        LocalDateTime startLocal = startTime.toLocalDateTime();  //ding dang Time Stamp ve LocalDateTime
+        LocalDateTime endLocal = endTime.toLocalDateTime();
+
+        if (startLocal.getYear() == endLocal.getYear() && startLocal.getMonth() == endLocal.getMonth()) {
+            long hours = Duration.between(startLocal, endLocal).toHours();
+            return new double[]{hours, 0};
+        }
+
+        LocalDateTime endOfFirstMonth = LocalDateTime.of(
+                startLocal.getYear(),
+                startLocal.getMonth(),
+                startLocal.getMonth().length(true),
+                23, 59
+        );
+
+        double hoursInMonth1 = Duration.between(startLocal, endOfFirstMonth).toHours();
+        LocalDateTime startOfSecondMonth = LocalDateTime.of(
+                endLocal.getYear(),
+                endLocal.getMonth(),
+                1, 0, 0
+        );
+
+        double hoursInMonth2 = Duration.between(startOfSecondMonth, endLocal).toHours();
+
+        return new double[]{hoursInMonth1, hoursInMonth2};
+    }
+
+
+
+    private void logRowsAffected(int rows1, int rows2) {
+        System.out.println("Các hàng bị ảnh hưởng trong tháng đầu tiên: " + rows1);
+        System.out.println("Các hàng bị ảnh hưởng trong tháng thu hai: " + rows2);
+    }
+
+
+
+
+
+
+
+
+
 }

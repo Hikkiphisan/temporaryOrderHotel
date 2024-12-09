@@ -33,8 +33,9 @@ public interface RoomBookingDAO {
 
 
     boolean updateRoomStatustoSql_DatPhong(int bookingId, String customerName, Timestamp startTime, Timestamp endTime) throws SQLException;
-    boolean updateRoomStatustoSql_HuyPhong(String customerName) throws SQLException;
+    boolean updateRoomStatustoSql_HuyPhong(int bookingId, String customerName, Timestamp startTime, Timestamp endTime) throws SQLException;
 
+    boolean updateRoomStatustoSql_HuyPhong_rutgon(int bookingId) throws SQLException;
 
 
     //thu nghiem
@@ -45,5 +46,22 @@ public interface RoomBookingDAO {
 
 
     boolean deleteRoomtoSQL(int roomId) throws SQLException;
+
+
+
+
+
+
+
+
+    public boolean update_to_table_monthly_revenue_on_Sql_DatPhong(double total_revenue, Timestamp startTime, Timestamp endTime) throws SQLException;
+
+
+
+
+    public double[] calculateHoursByMonth(Timestamp startTime, Timestamp endTime) ;
+
+
+
 }
 

@@ -6,6 +6,9 @@ import org.example.temporary.model.RoomBooking;
 import org.example.temporary.service.RoomBookingService;
 import org.example.temporary.service.RoomBookingServiceImpl;
 
+
+
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
@@ -15,6 +18,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
+
 
 @WebServlet(name = "Controller", urlPatterns = "/main_roombooking")
 public class RoomBookingController extends HttpServlet {
@@ -76,7 +80,7 @@ public class RoomBookingController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
 
-        try { //không dùng
+        try { //không dùng, có the delete
             if ("add".equals(action)) { // Thêm mới một bản ghi đặt phòng
                 // Lấy thông tin từ request
                 String customerName = request.getParameter("customerName");
@@ -109,7 +113,7 @@ public class RoomBookingController extends HttpServlet {
                 roomBookingService.updateRoom_DatPhong(roomTypeId, customerName,bookingStartDate,bookingEndDate);
 
             } else if ("datphong".equals(action)) { // Cập nhật thông tin đặt phòng
-                // Lấy thông tin từ request
+                // Lấy thông tin từ jsp
                 int bookingId = Integer.parseInt(request.getParameter("bookingId"));
                 String customerName = request.getParameter("customerName");
                 int roomTypeId = Integer.parseInt(request.getParameter("roomTypeId"));
@@ -138,11 +142,17 @@ public class RoomBookingController extends HttpServlet {
                 );
 
                 // Gọi service để cập nhật đặt phòng
-                roomBookingService.updateRoom_DatPhong(roomTypeId,customerName,bookingStartDate,bookingEndDate);
+                roomBookingService.updateRoom_DatPhong(bookingId,customerName,bookingStartDate,bookingEndDate);
 
             } else if ("huyphong".equals(action)) { // Xóa đặt phòng
                 String customerName = request.getParameter("customerName");
-                roomBookingService.updateRoom_HuyPhong(customerName);
+                int bookingId = Integer.parseInt(request.getParameter("bookingId"));
+//                String customerName = request.getParameter("customerName");
+                Timestamp bookingStartDate = Timestamp.valueOf(request.getParameter("bookingStartDate"));
+                Timestamp bookingEndDate = Timestamp.valueOf(request.getParameter("bookingEndDate"));
+
+
+                roomBookingService.updateRoom_HuyPhong(bookingId,customerName,bookingStartDate,bookingEndDate);
             }
 
             // Chuyển hướng về trang chính sau khi thao tác xong

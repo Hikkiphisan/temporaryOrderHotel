@@ -12,6 +12,8 @@ public class RoomBookingServiceImpl implements RoomBookingService {
 
     private final RoomBookingDAO roomBookingDAO;
 
+
+
     public RoomBookingServiceImpl(RoomBookingDAO roomBookingDAO) {
         this.roomBookingDAO = roomBookingDAO;
     }  //RoomService không trực tiếp quản lý Connection, mà chỉ sử dụng DAO để thực hiện các tác vụ.
@@ -91,11 +93,16 @@ public class RoomBookingServiceImpl implements RoomBookingService {
         }
     }
 
+    @Override
+    public boolean updateRoom_HuyPhong(int bookingId, String customerName, Timestamp startTime, Timestamp endTime) {
+        return false;
+    }
 
-    public boolean updateRoom_HuyPhong(String customerName) {
+
+    public boolean updateRoom_HuyPhong_rutgon(int bookingId) {
         try {
             // Cập nhật trạng thái phòng thành 'rented'
-            boolean statusUpdated = roomBookingDAO.updateRoomStatustoSql_HuyPhong(customerName);
+            boolean statusUpdated = roomBookingDAO.updateRoomStatustoSql_HuyPhong_rutgon(bookingId);
 
             return statusUpdated;
         } catch (SQLException e) {
@@ -104,6 +111,18 @@ public class RoomBookingServiceImpl implements RoomBookingService {
         }
     }
 
+
+    public boolean updateTableRevenue_DatPhong(double total_revenue, Timestamp startTime, Timestamp endTime) {
+        try {
+//           gửi trả dữ liệu ve sql
+            boolean statusUpdated = roomBookingDAO.update_to_table_monthly_revenue_on_Sql_DatPhong(total_revenue, startTime, endTime);
+
+            return statusUpdated;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 
 
@@ -116,5 +135,8 @@ public class RoomBookingServiceImpl implements RoomBookingService {
             return false;
         }
     }
+
+
+
 }
 

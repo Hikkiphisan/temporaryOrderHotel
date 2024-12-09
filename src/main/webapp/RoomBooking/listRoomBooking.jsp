@@ -305,6 +305,7 @@
 
                                 <div class="btn-group">
                                     <form action="${pageContext.request.contextPath}/rentRoomForm_Temporary" method="get">
+                                        <input type="hidden" name="action" value="hien thi form dat phong">
                                         <input type="hidden" name="roomTypeId" value="${room.roomTypeId}">
                                         <input type="hidden" name="roomDescription" value="${room.roomDescription}">
                                         <input type="hidden" name="roomImgLink" value="${room.roomImgLink}">
@@ -316,8 +317,25 @@
                                         </button>
                                     </form>
 
-                                    <form action="main_roombooking" method="post">
-                                        <input type="hidden" name="action" value="huyphong">
+
+                                    <form action="${pageContext.request.contextPath}/rentRoomForm_Temporary" method="get">
+<%--                                        <input type="hidden" name="action" value="huy phong">--%>
+    <!-- Trường ẩn để gửi giá trị action -->
+                                        <input type="hidden" name="action" value="hien thi form huy phong">
+                                        <input type="hidden" name="roomTypeId" value="${room.roomTypeId}">
+                                        <input type="hidden" name="roomDescription" value="${room.roomDescription}">
+                                        <input type="hidden" name="roomImgLink" value="${room.roomImgLink}">
+                                        <input type="hidden" name="roomPrice" value="${room.roomPrice}">
+                                        <input type="hidden" name="roomLocation" value="${room.roomLocation}">
+                                        <input type="hidden" name="bookingId" value="${room.bookingId}">
+                                        <input type="hidden" name="customerName" value="${room.customerName}">
+
+<%--                                        <input type="hidden" name="bookingStartDate" value="${room.bookingStartDate}">--%>
+<%--                                        <input type="hidden" name="bookingEndDate" value="${room.bookingEndDate}">--%>
+<%--                                        <input type="hidden" name="roomStatus" value="${room.roomStatus}">--%>
+
+
+
                                         <button type="submit" class="btn btn-custom">
                                             <i class="fas fa-undo-alt me-1"></i> Trả phòng
                                         </button>
