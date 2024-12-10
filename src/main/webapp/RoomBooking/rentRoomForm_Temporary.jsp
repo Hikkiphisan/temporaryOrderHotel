@@ -356,46 +356,46 @@
 
 
     <script>
-        function sendData() {
-            const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
-            const loadingMessage = document.getElementById('loadingMessage');
-            const successMessage = document.getElementById('successMessage');
+        <%--function sendData() {--%>
+        <%--    const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));--%>
+        <%--    const loadingMessage = document.getElementById('loadingMessage');--%>
+        <%--    const successMessage = document.getElementById('successMessage');--%>
 
-            // Hiện modal
-            loadingMessage.style.display = 'block';
-            successMessage.style.display = 'none';
-            paymentModal.show();
+        <%--    // Hiện modal--%>
+        <%--    loadingMessage.style.display = 'block';--%>
+        <%--    successMessage.style.display = 'none';--%>
+        <%--    paymentModal.show();--%>
 
-            // Thêm dữ liệu cần gửi
-            const formData = new FormData();
-            formData.append('bookingId', "${param.bookingId}"); // Thêm thông tin bookingId từ server
-            formData.append('action', 'paymentProcessing'); // Dấu hiệu gửi thông tin thanh toán
+        <%--    // Thêm dữ liệu cần gửi--%>
+        <%--    const formData = new FormData();--%>
+        <%--    formData.append('bookingId', "${param.bookingId}"); // Thêm thông tin bookingId từ server--%>
+        <%--    formData.append('action', 'paymentProcessing'); // Dấu hiệu gửi thông tin thanh toán--%>
 
-            fetch("${pageContext.request.contextPath}/rentRoomForm_Temporary", {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    loadingMessage.style.display = 'none';
-                    if (data.success) {
-                        successMessage.style.display = 'block';
-                    } else {
-                        alert('Thanh toán thất bại');
-                    }
+        <%--    fetch("${pageContext.request.contextPath}/rentRoomForm_Temporary", {--%>
+        <%--        method: 'POST',--%>
+        <%--        body: formData--%>
+        <%--    })--%>
+        <%--        .then(response => response.json())--%>
+        <%--        .then(data => {--%>
+        <%--            loadingMessage.style.display = 'none';--%>
+        <%--            if (data.success) {--%>
+        <%--                successMessage.style.display = 'block';--%>
+        <%--            } else {--%>
+        <%--                alert('Thanh toán thất bại');--%>
+        <%--            }--%>
 
-                    // Ẩn modal sau 2 giây
-                    setTimeout(() => {
-                        paymentModal.hide();
-                    }, 2000);
-                })
-                .catch(error => {
-                    console.error('Error during payment processing:', error);
-                    loadingMessage.style.display = 'none';
-                    alert('Đã xảy ra lỗi trong quá trình thanh toán');
-                    paymentModal.hide();
-                });
-        }
+        <%--            // Ẩn modal sau 2 giây--%>
+        <%--            setTimeout(() => {--%>
+        <%--                paymentModal.hide();--%>
+        <%--            }, 2000);--%>
+        <%--        })--%>
+        <%--        .catch(error => {--%>
+        <%--            console.error('Error during payment processing:', error);--%>
+        <%--            loadingMessage.style.display = 'none';--%>
+        <%--            alert('Đã xảy ra lỗi trong quá trình thanh toán');--%>
+        <%--            paymentModal.hide();--%>
+        <%--        });--%>
+        <%--}--%>
     </script>
 
 
@@ -453,7 +453,7 @@
                     <div class="price-tag shine-effect">
                         <i class="fas fa-tag"></i>
                         ${param.roomPrice} VNĐ/giờ
-<%--                        day la roomrateperhour--%>
+                        <%--                        day la roomrateperhour--%>
                     </div>
                 </div>
             </div>
@@ -464,13 +464,29 @@
 
 
 
-
+<%--
     <div class="payment-section text-center mb-4">
         <button id="collectPayment" class="btn btn-payment shine-effect" onclick="sendData()">
             <i class="fas fa-money-bill-wave"></i> Thu tiền
         </button>
     </div>
+--%>
 
+<%--//thu nghiem--%>
+
+
+    <div class="payment-section text-center mb-4">
+        <form id="paymentForm" method="POST" action="${pageContext.request.contextPath}/rentRoomForm_Temporary">
+            <input type="hidden" name="action" value="xuat doanh thu len bang income">
+            <!-- Các trường ẩn để lưu trữ dữ liệu từ form -->
+            <input type="hidden" id="hiddenRoomPrice" name="roomPrice">
+            <input type="hidden" id="hiddenStartTime" name="startTime">
+            <input type="hidden" id="hiddenEndTime" name="endTime">
+            <button type="button" id="collectPayment" class="btn btn-payment shine-effect" onclick="submitPaymentForm()">
+                <i class="fas fa-money-bill-wave"></i> Thu tiền
+            </button>
+        </form>
+    </div>
 
 
 
@@ -488,7 +504,7 @@
         <!-- Trường ẩn để gửi giá trị action -->
         <input type="hidden" name="action" value="dat phong">
 
-<%--        Trường an de gui tra du lieu roomtypeID ve csdl--%>
+        <%--        Trường an de gui tra du lieu roomtypeID ve csdl--%>
         <input type="hidden" name="bookingId" value="${param.bookingId}">
 
         <div class="form-group">
@@ -504,6 +520,8 @@
                 Vui lòng nhập tên khách hàng
             </div>
         </div>
+
+
 
         <div class="row">
             <div class="col-md-6">
@@ -565,6 +583,28 @@
 
 
 </div>
+
+
+<script>
+    function submitPaymentForm() {
+        // Lấy giá trị từ các trường trong form "rentRoomForm" khi vua nhap tay vao
+        // const roomPrice = document.getElementById('roomPrice').value;
+        const startTime = document.getElementById('startTime').value;
+        const endTime = document.getElementById('endTime').value;
+
+        // Đưa các giá trị này vào các trường ẩn của "paymentForm"
+        document.getElementById('hiddenRoomPrice').value = ${param.roomPrice};
+        document.getElementById('hiddenStartTime').value = startTime;
+        document.getElementById('hiddenEndTime').value = endTime;
+
+
+
+        // Gửi form "paymentForm"
+        document.getElementById('paymentForm').submit();
+    }
+</script>
+
+
 
 
 

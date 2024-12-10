@@ -188,9 +188,17 @@ public class RoomRentFormController extends HttpServlet {
         }  else if ("xuat doanh thu len bang income".equals(action)) {
 
             try {
-                double total_revenue = Double.parseDouble(request.getParameter("total_revenue"));
-                Timestamp startTime = Timestamp.valueOf(request.getParameter("startTime"));
-                Timestamp endTime = Timestamp.valueOf(request.getParameter("endTime"));
+                double total_revenue = Double.parseDouble(request.getParameter("roomPrice"));
+                String startTimeStr = request.getParameter("startTime");
+                String endTimeStr = request.getParameter("endTime");
+
+
+              startTimeStr = startTimeStr.replace('T', ' ') + ":00";
+              endTimeStr = endTimeStr.replace('T', ' ') + ":00";
+
+
+                Timestamp startTime = Timestamp.valueOf(startTimeStr);
+                Timestamp endTime = Timestamp.valueOf(endTimeStr);
 
 
 //                    Timestamp startTime = Timestamp.valueOf(startTimeStr);
@@ -204,12 +212,12 @@ public class RoomRentFormController extends HttpServlet {
                     // Thành công: Thông báo và chuyển hướng tới trang thành công
                     request.setAttribute("successMessage", "Cap nhat doanh thu thanh cong!");
 //                    RequestDispatcher dispatcher = request.getRequestDispatcher("RoomBooking/incomeStatistics.jsp"); //chuyen huong tu bai cua Tung
-                    RequestDispatcher dispatcher = request.getRequestDispatcher("RoomBooking/main_roombooking.jsp.jsp"); //chuyen huong tu bai cua Tung
+                    RequestDispatcher dispatcher = request.getRequestDispatcher("/main_roombooking"); //chuyen huong tu bai cua Tung
                     dispatcher.forward(request, response);
                 } else {
                     // Lỗi trong quá trình hủy
                     request.setAttribute("errorMessage", "Không thể cap nhat doanh thu. Vui lòng thử lại sau.");
-                    RequestDispatcher dispatcher = request.getRequestDispatcher("RoomBooking/main_roombooking.jsp");
+                    RequestDispatcher dispatcher = request.getRequestDispatcher("/main_roombooking.jsp");
                     dispatcher.forward(request, response);
                 }
             } catch (NumberFormatException e) {
